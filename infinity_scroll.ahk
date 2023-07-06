@@ -1,11 +1,13 @@
-STRENGTH := 10
-DECAY := 1
+STRENGTH := 30            ; Higher = longer scrolling
+SENSITIVITY := 200        ; Time sensitivity (time between scrolls affects strength; lower will require faster finger)
+SENSITIVITY_EXP := 1.3    ; Value to make it feel more natural
+DECAY := 1                ; Decay per scroll
 
 #MaxThreadsPerHotkey 1
 
 infScroll := 0
 momentum := 0
-
+lastTick := 0
 
 *XButton2::
     infScroll := 1
@@ -13,12 +15,12 @@ momentum := 0
     {
         if (momentum < 0) {
             Send, {WheelUp}
-            momentum += DECAY
+			momentum := Min(0, momentum + DECAY)
         } else if (momentum > 0) {
             Send, {WheelDown}
-            momentum -= DECAY
+            momentum := Max(0, momentum - DECAY)
         }
-        Sleep, 20 + 70 - Max(Min(35, Abs(momentum)), 0)*2
+        Sleep, 10 + 80 - Max(Min(20, Abs(momentum)), 0)*4
     }
     momentum := 0
     infScroll := 0
@@ -27,11 +29,13 @@ return
 
 #If infScroll
     *WheelDown::
-        momentum += STRENGTH
+        momentum += 1 + STRENGTH * ((SENSITIVITY - Max(Min(SENSITIVITY, A_TickCount - lastTick), 0)) / SENSITIVITY) ** SENSITIVITY_EXP
+		lastTick := A_TickCount
     return
 
     *WheelUp::
-        momentum -= STRENGTH
+        momentum -= 1 + STRENGTH * ((SENSITIVITY - Max(Min(SENSITIVITY, A_TickCount - lastTick), 0)) / SENSITIVITY) ** SENSITIVITY_EXP
+		lastTick := A_TickCount
     return
 #If
 
