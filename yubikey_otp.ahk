@@ -1,3 +1,6 @@
+; Requires ykman in PATH
+; pip install --user yubikey-manager
+
 #NoTrayIcon
 #MaxThreads 1
 #Include StdOutToVar.ahk
